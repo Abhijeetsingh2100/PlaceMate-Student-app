@@ -8,8 +8,10 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import 'global.css'
+import { useRouter } from "expo-router";
 
 const SignIn = () => {
+    const router = useRouter();
   return (
     <SafeAreaView className="flex-1 bg-white px-6">
 
@@ -113,7 +115,12 @@ const SignIn = () => {
             Don't have an account?
           </Text>
 
-          <TouchableOpacity>
+          <TouchableOpacity
+             onPress={() => router.push("/(auth)/sign-up")
+            
+          }
+          
+          >
             <Text className="text-[#6155F5] font-semibold ml-1">
               Create an Account
             </Text>

@@ -39,13 +39,13 @@ const index = () => {
     </Text>
 
   </View>
-  <View className='px-5 pt-4'>
+  <View className='px-5 mt-8'>
 
  <TouchableOpacity
   className="bg-[#6155F5] h-14 rounded-xl mt-8 justify-center items-center shadow-xl "
-  onPress={() => {
-    console.log("Button Pressed");
-  }}
+     onPress={() => router.push("/(auth)/sign-up")
+            
+          }
 >
   <Text className="text-white font-bold text-lg">
     Get Started
