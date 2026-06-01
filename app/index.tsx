@@ -1,10 +1,12 @@
 import { View, Text, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
+import { useRouter } from "expo-router";
 
 import '../global.css'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 const index = () => {
+   const router = useRouter();
   return (
     <SafeAreaView>
 
@@ -52,16 +54,16 @@ const index = () => {
   </View>
   <View className='px-5 '>
 
- <TouchableOpacity
-  className="border border-[#6155F5] h-14 rounded-xl mt-8 justify-center items-center  "
-  onPress={() => {
-    console.log("Button Pressed");
-  }}
->
-  <Text className="text-[#6155F5] font-bold text-lg">
-    Get Started
-  </Text>
-</TouchableOpacity>
+  <TouchableOpacity
+          className="border border-[#6155F5] h-14 rounded-xl mt-4 items-center justify-center"
+          onPress={() => router.push("/(auth)/sign-in")
+            
+          }
+        >
+          <Text className="text-[#6155F5] font-bold text-lg">
+            Login
+          </Text>
+        </TouchableOpacity>
   </View>
     </SafeAreaView>
   )
