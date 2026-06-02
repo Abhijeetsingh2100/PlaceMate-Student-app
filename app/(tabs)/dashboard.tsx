@@ -194,6 +194,7 @@ export default function Dashboard() {
 
             <TouchableOpacity
               className="h-20 w-[31%] items-center justify-center rounded-2xl bg-white"
+              onPress={() => router.push('/reports')}
               style={{ elevation: 4 }}>
               <Ionicons name="book-outline" size={24} color="#3525CD" />
               <Text className="mt-1 font-semibold">Study</Text>
@@ -201,6 +202,7 @@ export default function Dashboard() {
 
             <TouchableOpacity
               className="h-20 w-[31%] items-center justify-center rounded-2xl bg-white"
+              onPress={() => router.push('/schedule')}
               style={{ elevation: 4 }}>
               <Ionicons name="calendar-outline" size={24} color="#3525CD" />
               <Text className="mt-1 font-semibold">Schedule</Text>
@@ -239,6 +241,23 @@ export default function Dashboard() {
 
           {recentApps.map((app) => {
             const { icon, bg } = getStatusIcon(app.status);
+
+            // Calculate dynamic time from the timestamp ID
+            let displayTime = app.date;
+            const timestamp = parseInt(app.id, 10);
+            // Valid timestamp IDs are long (e.g., 171...)
+            if (!isNaN(timestamp) && app.id.length > 10) {
+              const diffMs = Date.now() - timestamp;
+              const diffMins = Math.floor(diffMs / (1000 * 60));
+              const diffHrs = Math.floor(diffMins / 60);
+              const diffDays = Math.floor(diffHrs / 24);
+
+              if (diffDays > 0) displayTime = `${diffDays}d ago`;
+              else if (diffHrs > 0) displayTime = `${diffHrs}h ago`;
+              else if (diffMins > 0) displayTime = `${diffMins}m ago`;
+              else displayTime = 'Just now';
+            }
+
             return (
               <View
                 key={app.id}
@@ -255,7 +274,7 @@ export default function Dashboard() {
                     </Text>
                   </View>
                 </View>
-                <Text className="font-semibold text-gray-400">{app.date}</Text>
+                <Text className="font-semibold text-gray-400">{displayTime}</Text>
               </View>
             );
           })}

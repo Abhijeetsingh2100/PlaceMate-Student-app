@@ -12,6 +12,7 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons, Feather } from '@expo/vector-icons';
 import { supabase } from '../../lib/supabase';
 
@@ -36,6 +37,8 @@ export default function Applications() {
   const [status, setStatus] = useState('Applied');
   const [salary, setSalary] = useState('');
   const [notes, setNotes] = useState('');
+  const [eventDate, setEventDate] = useState('');
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [editingAppId, setEditingAppId] = useState<string | null>(null);
   const [actionMenuVisible, setActionMenuVisible] = useState(false);
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
@@ -75,6 +78,7 @@ export default function Applications() {
     setCompany(app.company);
     setRole(app.role);
     setSalary(app.salary);
+    setEventDate((app as any).event_date || '');
     setStatus(app.status);
     setModalVisible(true);
   };
@@ -108,6 +112,7 @@ export default function Applications() {
         role,
         status,
         salary: salary || 'N/A',
+        event_date: eventDate || null,
         statusColor,
         icon: company.charAt(0).toUpperCase(),
       };
@@ -133,6 +138,7 @@ export default function Applications() {
         role,
         status,
         salary: salary || 'N/A',
+        event_date: eventDate || null,
         date: 'Just now',
         icon: company.charAt(0).toUpperCase(),
         iconBg: 'bg-gray-200',
@@ -272,6 +278,7 @@ export default function Applications() {
           setCompany('');
           setRole('');
           setSalary('');
+          setEventDate('');
           setStatus('Applied');
           setModalVisible(true);
         }}
@@ -301,6 +308,7 @@ export default function Applications() {
                   setCompany('');
                   setRole('');
                   setSalary('');
+                  setEventDate('');
                   setStatus('Applied');
                 }}>
                 <Ionicons name="close" size={28} color="#6B7280" />
@@ -330,6 +338,34 @@ export default function Applications() {
               onChangeText={setSalary}
               className="mb-4 rounded-xl border border-gray-300 px-4 py-3"
             />
+
+            <Text className="mb-2 font-semibold text-gray-700">Event Date (YYYY-MM-DD)</Text>
+            <TouchableOpacity
+              onPress={() => setShowDatePicker(true)}
+              className="mb-4 flex-row items-center justify-between rounded-xl border border-gray-300 px-4 py-3">
+              <Text className={eventDate ? 'text-black' : 'text-gray-400'}>
+                {eventDate || 'Select Date'}
+              </Text>
+              <Feather name="calendar" size={20} color="#6B7280" />
+            </TouchableOpacity>
+
+            {showDatePicker && (
+              <DateTimePicker
+                value={eventDate ? new Date(eventDate) : new Date()}
+                mode="date"
+                display="default"
+                onChange={(event, selectedDate) => {
+                  setShowDatePicker(Platform.OS === 'ios'); // Keep open on iOS until manually closed usually, but let's just close it
+                  if (Platform.OS === 'android') setShowDatePicker(false);
+                  if (event.type === 'set' && selectedDate) {
+                    const formattedDate = selectedDate.toISOString().split('T')[0];
+                    setEventDate(formattedDate);
+                  } else if (event.type === 'dismissed') {
+                    setShowDatePicker(false);
+                  }
+                }}
+              />
+            )}
 
             <Text className="mb-2 font-semibold text-gray-700">Status</Text>
             <ScrollView
