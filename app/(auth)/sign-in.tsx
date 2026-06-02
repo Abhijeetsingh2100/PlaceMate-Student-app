@@ -16,14 +16,14 @@ const SignIn = () => {
     <SafeAreaView className="flex-1 bg-white px-6">
 
       {/* Logo Section */}
-      <View className="items-center mt-12">
+      <View className="items-center mt-12 ">
         <Image
           source={require("../../assets/images/screenlogo.png")}
           className="w-36 h-36"
         
         />
 
-        <Text className="text-3xl font-bold text-[#6155F5] mt-4">
+        <Text className="text-3xl font-bold text-[#3525CD] mt-4">
           Placement Tracker
         </Text>
 
@@ -73,7 +73,7 @@ const SignIn = () => {
 
         {/* Login Button */}
         <TouchableOpacity
-          className="bg-[#6155F5] h-14 rounded-xl items-center justify-center mt-8"
+          className="bg-[#3525CD] h-14 rounded-xl items-center justify-center mt-8"
           style={{
             elevation: 6,
         }}
