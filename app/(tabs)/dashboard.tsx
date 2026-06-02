@@ -15,6 +15,94 @@ export default function Dashboard() {
   const rejectedApps = applications.filter((app) => app.status === 'Rejected').length;
   const offerApps = applications.filter((app) => app.status === 'Offer').length;
 
+  // Dynamic Recent Activity (Top 3)
+  const recentApps = applications.slice(0, 3);
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'Offer':
+        return { icon: '💼', bg: 'bg-green-200' };
+      case 'Interview':
+        return { icon: '📅', bg: 'bg-purple-200' };
+      case 'Rejected':
+        return { icon: '❌', bg: 'bg-red-200' };
+      default:
+        return { icon: '📋', bg: 'bg-blue-100' };
+    }
+  };
+
+  const getStatusTitle = (status: string) => {
+    switch (status) {
+      case 'Offer':
+        return 'Offer Received';
+      case 'Interview':
+        return 'Interview Scheduled';
+      case 'Rejected':
+        return 'Application Rejected';
+      case 'OA':
+        return 'Online Assessment';
+      default:
+        return 'Application Submitted';
+    }
+  };
+
+  // Dynamic Monthly Trend
+  const getMonthIndex = (dateStr: string) => {
+    if (
+      dateStr.includes('now') ||
+      dateStr.includes('ago') ||
+      dateStr.includes('Today') ||
+      dateStr.includes('Yesterday')
+    ) {
+      return new Date().getMonth();
+    }
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    const found = months.findIndex((m) => dateStr.includes(m));
+    return found !== -1 ? found : new Date().getMonth();
+  };
+
+  const monthCounts = new Array(12).fill(0);
+  applications.forEach((app) => {
+    monthCounts[getMonthIndex(app.date)]++;
+  });
+
+  const currentMonth = new Date().getMonth();
+  const last6MonthsData = [];
+  for (let i = 5; i >= 0; i--) {
+    let m = currentMonth - i;
+    if (m < 0) m += 12;
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    last6MonthsData.push({ month: months[m], count: monthCounts[m] });
+  }
+
+  const maxCount = Math.max(...last6MonthsData.map((d) => d.count), 1);
+
   return (
     <SafeAreaView className="flex-1 bg-[#F7F8FC]">
       <ScrollView
@@ -130,81 +218,48 @@ export default function Dashboard() {
 
           {/* Chart */}
           <View className="mt-8 h-40 flex-row items-end justify-between">
-            <View className="items-center">
-              <View className="h-16 w-12 rounded-t-xl bg-gray-200" />
-              <Text className="mt-3 text-gray-600">Jan</Text>
-            </View>
-
-            <View className="items-center">
-              <View className="h-24 w-12 rounded-t-xl bg-gray-200" />
-              <Text className="mt-3 text-gray-600">Feb</Text>
-            </View>
-
-            <View className="items-center">
-              <View className="h-36 w-12 rounded-t-xl bg-[#3525CD]" />
-              <Text className="mt-3 text-gray-600">Mar</Text>
-            </View>
-
-            <View className="items-center">
-              <View className="h-20 w-12 rounded-t-xl bg-gray-200" />
-              <Text className="mt-3 text-gray-600">Apr</Text>
-            </View>
-
-            <View className="items-center">
-              <View className="h-28 w-12 rounded-t-xl bg-gray-200" />
-              <Text className="mt-3 text-gray-600">May</Text>
-            </View>
-
-            <View className="items-center">
-              <View className="h-12 w-12 rounded-t-xl bg-gray-200" />
-              <Text className="mt-3 text-gray-600">Jun</Text>
-            </View>
+            {last6MonthsData.map((data, index) => {
+              const heightPx = Math.max((data.count / maxCount) * 120, 20); // max 120px, min 20px
+              return (
+                <View key={index} className="items-center">
+                  <View
+                    className={`w-11 rounded-t-xl ${index === 5 && data.count > 0 ? 'bg-[#3525CD]' : 'bg-gray-200'}`}
+                    style={{ height: heightPx }}
+                  />
+                  <Text className="mt-3 text-gray-600">{data.month}</Text>
+                </View>
+              );
+            })}
           </View>
         </View>
         <View className="mb-8 mt-6 px-4">
           <Text className="mb-4 text-2xl font-bold text-[#1F2937]">Recent Activity</Text>
 
-          {/* Activity 1 */}
-          <View
-            className="mb-4 flex-row items-center justify-between rounded-2xl bg-white p-4"
-            style={{
-              elevation: 4,
-            }}>
-            <View className="flex-1 flex-row items-center">
-              <View className="h-14 w-14 items-center justify-center rounded-full bg-green-200">
-                <Text className="text-2xl">💼</Text>
+          {recentApps.map((app) => {
+            const { icon, bg } = getStatusIcon(app.status);
+            return (
+              <View
+                key={app.id}
+                className="mb-4 flex-row items-center justify-between rounded-2xl bg-white p-4"
+                style={{ elevation: 4 }}>
+                <View className="flex-1 flex-row items-center">
+                  <View className={`h-14 w-14 items-center justify-center rounded-full ${bg}`}>
+                    <Text className="text-2xl">{icon}</Text>
+                  </View>
+                  <View className="ml-4 flex-1">
+                    <Text className="text-xl font-bold">{getStatusTitle(app.status)}</Text>
+                    <Text className="text-lg text-gray-500" numberOfLines={1}>
+                      {app.company} • {app.role}
+                    </Text>
+                  </View>
+                </View>
+                <Text className="font-semibold text-gray-400">{app.date}</Text>
               </View>
-
-              <View className="ml-4 flex-1">
-                <Text className="text-xl font-bold">Offer Received</Text>
-
-                <Text className="text-lg text-gray-500">Google • Software Engineer</Text>
-              </View>
-            </View>
-
-            <Text className="font-semibold text-gray-400">2h ago</Text>
-          </View>
-
-          {/* Activity 2 */}
-          <View
-            className="flex-row items-center justify-between rounded-2xl bg-white p-4"
-            style={{
-              elevation: 4,
-            }}>
-            <View className="flex-1 flex-row items-center">
-              <View className="h-14 w-14 items-center justify-center rounded-full bg-[#4F46E5]">
-                <Text className="text-2xl text-white">📋</Text>
-              </View>
-
-              <View className="ml-4 flex-1">
-                <Text className="text-xl font-bold">Task Completed</Text>
-
-                <Text className="text-lg text-gray-500">Updated Portfolio Resume</Text>
-              </View>
-            </View>
-
-            <Text className="font-semibold text-gray-400">Yesterday</Text>
-          </View>
+            );
+          })}
+          {recentApps.length === 0 && (
+            <Text className="mt-4 text-center text-gray-500">No recent activity.</Text>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>

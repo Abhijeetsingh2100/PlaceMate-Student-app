@@ -9,6 +9,7 @@ import {
   Modal,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, Feather } from '@expo/vector-icons';
@@ -34,6 +35,42 @@ export default function Applications() {
   const [status, setStatus] = useState('Applied');
   const [salary, setSalary] = useState('');
   const [notes, setNotes] = useState('');
+  const [editingAppId, setEditingAppId] = useState<string | null>(null);
+  const [actionMenuVisible, setActionMenuVisible] = useState(false);
+  const [selectedApp, setSelectedApp] = useState<Application | null>(null);
+
+  const handleLongPress = (app: Application) => {
+    setSelectedApp(app);
+    setActionMenuVisible(true);
+  };
+
+  const handleDelete = (id: string) => {
+    setApplications((prev) => prev.filter((app) => app.id !== id));
+  };
+
+  const confirmDelete = (app: Application) => {
+    Alert.alert(
+      'Delete Application',
+      `Are you sure you want to delete your application for ${app.company}?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => handleDelete(app.id),
+        },
+      ]
+    );
+  };
+
+  const openEditModal = (app: Application) => {
+    setEditingAppId(app.id);
+    setCompany(app.company);
+    setRole(app.role);
+    setSalary(app.salary);
+    setStatus(app.status);
+    setModalVisible(true);
+  };
 
   const filteredApps = useMemo(() => {
     return applications.filter((app) => {
@@ -50,7 +87,7 @@ export default function Applications() {
     (app) => !['Rejected', 'Offer'].includes(app.status)
   ).length;
 
-  const handleAddApplication = () => {
+  const handleSaveApplication = () => {
     if (!company || !role) return;
 
     let statusColor = 'text-[#3525CD]';
@@ -58,24 +95,43 @@ export default function Applications() {
     if (status === 'Interview') statusColor = 'text-[#A16207]';
     if (status === 'Rejected') statusColor = 'text-red-500';
 
-    const newApp: Application = {
-      id: Date.now().toString(),
-      company,
-      role,
-      status,
-      salary: salary || 'N/A',
-      date: 'Just now',
-      icon: company.charAt(0).toUpperCase(),
-      iconBg: 'bg-gray-200',
-      statusColor,
-    };
+    if (editingAppId) {
+      setApplications((prev) =>
+        prev.map((app) =>
+          app.id === editingAppId
+            ? {
+                ...app,
+                company,
+                role,
+                status,
+                salary: salary || 'N/A',
+                statusColor,
+                icon: company.charAt(0).toUpperCase(),
+              }
+            : app
+        )
+      );
+    } else {
+      const newApp: Application = {
+        id: Date.now().toString(),
+        company,
+        role,
+        status,
+        salary: salary || 'N/A',
+        date: 'Just now',
+        icon: company.charAt(0).toUpperCase(),
+        iconBg: 'bg-gray-200',
+        statusColor,
+      };
+      setApplications([newApp, ...applications]);
+    }
 
-    setApplications([newApp, ...applications]);
     setCompany('');
     setRole('');
     setSalary('');
     setStatus('Applied');
     setNotes('');
+    setEditingAppId(null);
     setModalVisible(false);
   };
 
@@ -146,8 +202,10 @@ export default function Applications() {
 
         {/* Applications List */}
         {filteredApps.map((app) => (
-          <View
+          <TouchableOpacity
             key={app.id}
+            onLongPress={() => handleLongPress(app)}
+            delayLongPress={300}
             className="mx-4 mt-4 flex-row rounded-3xl bg-white p-4"
             style={{ elevation: 4 }}>
             {imageErrors[app.id] ? (
@@ -172,7 +230,7 @@ export default function Applications() {
               <Text className="text-xl font-bold text-[#3525CD]">{app.salary}</Text>
               <Text className="mt-2 text-gray-500">{app.date}</Text>
             </View>
-          </View>
+          </TouchableOpacity>
         ))}
         {filteredApps.length === 0 && (
           <View className="mx-4 mt-10 items-center justify-center">
@@ -183,7 +241,14 @@ export default function Applications() {
 
       {/* Floating Add Button */}
       <TouchableOpacity
-        onPress={() => setModalVisible(true)}
+        onPress={() => {
+          setEditingAppId(null);
+          setCompany('');
+          setRole('');
+          setSalary('');
+          setStatus('Applied');
+          setModalVisible(true);
+        }}
         className="absolute bottom-6 right-6 h-16 w-16 items-center justify-center rounded-2xl bg-[#3525CD]"
         style={{ elevation: 10 }}>
         <Feather name="plus" size={28} color="white" />
@@ -200,8 +265,18 @@ export default function Applications() {
           className="flex-1 justify-end bg-black/50">
           <View className="rounded-t-3xl bg-white p-6 pb-10" style={{ elevation: 10 }}>
             <View className="mb-4 flex-row items-center justify-between">
-              <Text className="text-2xl font-bold text-[#3525CD]">New Application</Text>
-              <TouchableOpacity onPress={() => setModalVisible(false)}>
+              <Text className="text-2xl font-bold text-[#3525CD]">
+                {editingAppId ? 'Edit Application' : 'New Application'}
+              </Text>
+              <TouchableOpacity
+                onPress={() => {
+                  setModalVisible(false);
+                  setEditingAppId(null);
+                  setCompany('');
+                  setRole('');
+                  setSalary('');
+                  setStatus('Applied');
+                }}>
                 <Ionicons name="close" size={28} color="#6B7280" />
               </TouchableOpacity>
             </View>
@@ -249,13 +324,76 @@ export default function Applications() {
             </ScrollView>
 
             <TouchableOpacity
-              onPress={handleAddApplication}
+              onPress={handleSaveApplication}
               className="mt-2 h-14 items-center justify-center rounded-xl bg-[#3525CD]"
               style={{ elevation: 6 }}>
               <Text className="text-lg font-bold text-white">Save Application</Text>
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
+      </Modal>
+
+      {/* Action Menu Modal */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={actionMenuVisible}
+        onRequestClose={() => setActionMenuVisible(false)}>
+        <TouchableOpacity
+          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}
+          activeOpacity={1}
+          onPress={() => setActionMenuVisible(false)}>
+          <View className="rounded-t-3xl bg-white p-6 pb-10" style={{ elevation: 10 }}>
+            {/* Header */}
+            <View className="mb-6 flex-row items-center justify-between">
+              <View>
+                <Text className="text-2xl font-bold text-[#1F2937]">{selectedApp?.company}</Text>
+                <Text className="text-gray-500">{selectedApp?.role}</Text>
+              </View>
+              {selectedApp && (
+                <Image
+                  source={{
+                    uri: `https://icon.horse/icon/${getCompanyDomain(selectedApp.company)}`,
+                  }}
+                  className="h-12 w-12 rounded-xl bg-gray-100"
+                  style={{ width: 48, height: 48 }}
+                />
+              )}
+            </View>
+
+            {/* Actions */}
+            <TouchableOpacity
+              onPress={() => {
+                setActionMenuVisible(false);
+                if (selectedApp) openEditModal(selectedApp);
+              }}
+              className="mb-4 flex-row items-center rounded-2xl bg-gray-100 p-4">
+              <View className="h-10 w-10 items-center justify-center rounded-full bg-blue-100">
+                <Feather name="edit-2" size={20} color="#3525CD" />
+              </View>
+              <Text className="ml-4 text-lg font-bold text-[#1F2937]">Edit Application</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => {
+                setActionMenuVisible(false);
+                if (selectedApp) confirmDelete(selectedApp);
+              }}
+              className="mb-6 flex-row items-center rounded-2xl bg-red-50 p-4">
+              <View className="h-10 w-10 items-center justify-center rounded-full bg-red-100">
+                <Feather name="trash-2" size={20} color="#EF4444" />
+              </View>
+              <Text className="ml-4 text-lg font-bold text-red-500">Delete Application</Text>
+            </TouchableOpacity>
+
+            {/* Cancel */}
+            <TouchableOpacity
+              onPress={() => setActionMenuVisible(false)}
+              className="items-center py-2">
+              <Text className="text-lg font-semibold text-gray-400">Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
       </Modal>
     </SafeAreaView>
   );
