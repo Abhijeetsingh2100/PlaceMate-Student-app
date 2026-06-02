@@ -13,63 +13,20 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, Feather } from '@expo/vector-icons';
 
-type Application = {
-  id: string;
-  company: string;
-  role: string;
-  status: string;
-  salary: string;
-  date: string;
-  icon: string;
-  iconBg: string;
-  statusColor: string;
-  iconColor?: string;
-};
-
-const initialApps: Application[] = [
-  {
-    id: '1',
-    company: 'Google',
-    role: 'SDE Intern',
-    status: 'Applied',
-    salary: '$120k',
-    date: '2 days ago',
-    icon: 'G',
-    iconBg: 'bg-black',
-    statusColor: 'text-green-600',
-    iconColor: 'text-yellow-400',
-  },
-  {
-    id: '2',
-    company: 'Microsoft',
-    role: 'PM Intern',
-    status: 'Interview',
-    salary: '$110k',
-    date: 'Oct 12',
-    icon: '🪟',
-    iconBg: 'bg-[#E5E7EB]',
-    statusColor: 'text-[#A16207]',
-  },
-  {
-    id: '3',
-    company: 'Stripe',
-    role: 'Backend Engineer',
-    status: 'Rejected',
-    salary: '$130k',
-    date: 'Oct 05',
-    icon: '💳',
-    iconBg: 'bg-gray-300',
-    statusColor: 'text-red-500',
-  },
-];
+import { useApplications, Application } from '../../context/ApplicationsContext';
 
 const FILTERS = ['All', 'Applied', 'OA', 'Interview', 'Rejected'];
 
 export default function Applications() {
-  const [applications, setApplications] = useState<Application[]>(initialApps);
+  const { applications, setApplications, modalVisible, setModalVisible } = useApplications();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('All');
-  const [modalVisible, setModalVisible] = useState(false);
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+
+  const getCompanyDomain = (companyName: string) => {
+    const cleanName = companyName.toLowerCase().replace(/[^a-z0-9]/g, '');
+    return `${cleanName}.com`;
+  };
 
   // Form state
   const [company, setCompany] = useState('');
@@ -130,13 +87,21 @@ export default function Applications() {
         {/* Header */}
         <View
           className="mx-4 mt-4 flex-row items-center justify-between rounded-3xl bg-white px-4 py-3"
-          style={{ elevation: 8 }}>
+          style={{
+            elevation: 8,
+          }}>
           <Image
             source={require('../../assets/images/avatar1.png')}
-            className="h-12 w-12 rounded-full"
+            className="h-14 w-14 rounded-full"
           />
-          <Text className="text-xl font-bold text-[#3525CD]">Placement Tracker</Text>
-          <TouchableOpacity>
+
+          <Text className="text-2xl font-bold text-[#3525CD]">PlaceMate</Text>
+
+          <TouchableOpacity
+            className="h-12 w-12 items-center justify-center rounded-2xl bg-white"
+            style={{
+              elevation: 4,
+            }}>
             <Ionicons name="notifications-outline" size={24} color="#3525CD" />
           </TouchableOpacity>
         </View>
@@ -185,9 +150,19 @@ export default function Applications() {
             key={app.id}
             className="mx-4 mt-4 flex-row rounded-3xl bg-white p-4"
             style={{ elevation: 4 }}>
-            <View className={`h-12 w-12 items-center justify-center rounded-xl ${app.iconBg}`}>
-              <Text className={`font-bold ${app.iconColor || 'text-black'}`}>{app.icon}</Text>
-            </View>
+            {imageErrors[app.id] ? (
+              <View className={`h-12 w-12 items-center justify-center rounded-xl ${app.iconBg}`}>
+                <Text className={`font-bold ${app.iconColor || 'text-black'}`}>{app.icon}</Text>
+              </View>
+            ) : (
+              <Image
+                source={{ uri: `https://icon.horse/icon/${getCompanyDomain(app.company)}` }}
+                className="rounded-xl bg-white"
+                style={{ width: 48, height: 48 }}
+                resizeMode="contain"
+                onError={() => setImageErrors((prev) => ({ ...prev, [app.id]: true }))}
+              />
+            )}
             <View className="ml-4 flex-1">
               <Text className={`text-xl font-bold uppercase ${app.statusColor}`}>{app.status}</Text>
               <Text className="mt-1 text-2xl">{app.company}</Text>

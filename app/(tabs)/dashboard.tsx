@@ -1,8 +1,20 @@
 import { View, Text, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+import { useApplications } from '../../context/ApplicationsContext';
 
 export default function Dashboard() {
+  const router = useRouter();
+  const { applications, setModalVisible } = useApplications();
+
+  const totalApps = applications.length;
+  const activeApps = applications.filter(
+    (app) => !['Rejected', 'Offer'].includes(app.status)
+  ).length;
+  const rejectedApps = applications.filter((app) => app.status === 'Rejected').length;
+  const offerApps = applications.filter((app) => app.status === 'Offer').length;
+
   return (
     <SafeAreaView className="flex-1 bg-[#F7F8FC]">
       <ScrollView
@@ -46,14 +58,14 @@ export default function Dashboard() {
           <View className="flex-row justify-between">
             {/* Applications */}
             <View className="h-28 w-[48%] rounded-2xl bg-white p-4" style={{ elevation: 6 }}>
-              <Text className="text-3xl font-bold text-[#3525CD]">12</Text>
+              <Text className="text-3xl font-bold text-[#3525CD]">{totalApps}</Text>
 
               <Text className="mt-1 text-gray-500">Applications</Text>
             </View>
 
             {/* Active */}
             <View className="h-28 w-[48%] rounded-2xl bg-white p-4" style={{ elevation: 6 }}>
-              <Text className="text-3xl font-bold text-green-600">5</Text>
+              <Text className="text-3xl font-bold text-green-600">{activeApps}</Text>
 
               <Text className="mt-1 text-gray-500">Active</Text>
             </View>
@@ -62,14 +74,14 @@ export default function Dashboard() {
           <View className="mt-4 flex-row justify-between">
             {/* Rejected */}
             <View className="h-28 w-[48%] rounded-2xl bg-white p-4" style={{ elevation: 6 }}>
-              <Text className="text-3xl font-bold text-red-500">2</Text>
+              <Text className="text-3xl font-bold text-red-500">{rejectedApps}</Text>
 
               <Text className="mt-1 text-gray-500">Rejected</Text>
             </View>
 
             {/* Offers */}
             <View className="h-28 w-[48%] rounded-2xl bg-white p-4" style={{ elevation: 6 }}>
-              <Text className="text-3xl font-bold text-yellow-600">1</Text>
+              <Text className="text-3xl font-bold text-yellow-600">{offerApps}</Text>
 
               <Text className="mt-1 text-gray-500">Offers</Text>
             </View>
@@ -81,7 +93,10 @@ export default function Dashboard() {
           <View className="flex-row justify-between">
             <TouchableOpacity
               className="h-20 w-[31%] items-center justify-center rounded-2xl bg-[#3525CD]"
-              
+              onPress={() => {
+                setModalVisible(true);
+                router.push('/applications');
+              }}
               style={{ elevation: 4 }}>
               <Ionicons name="add-circle-outline" size={24} color="white" />
               <Text className="mt-1 font-semibold text-white">Add App</Text>
