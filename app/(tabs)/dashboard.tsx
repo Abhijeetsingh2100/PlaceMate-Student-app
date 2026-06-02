@@ -121,7 +121,9 @@ export default function Dashboard() {
             className="h-14 w-14 rounded-full"
           />
 
-          <Text className="text-2xl justify-center px-4 items-center font-bold text-[#3525CD]">PlaceMate</Text>
+          <Text className="items-center justify-center px-4 text-2xl font-bold text-[#3525CD]">
+            PlaceMate
+          </Text>
 
           {/* <TouchableOpacity
             className="h-12 w-12 items-center justify-center rounded-2xl bg-white"

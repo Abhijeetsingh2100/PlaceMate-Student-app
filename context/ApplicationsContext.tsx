@@ -1,5 +1,5 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
-
+import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
 export type Application = {
   id: string;
   company: string;
@@ -13,43 +13,6 @@ export type Application = {
   iconColor?: string;
 };
 
-const initialApps: Application[] = [
-  {
-    id: '1',
-    company: 'Google',
-    role: 'SDE Intern',
-    status: 'Applied',
-    salary: '$120k',
-    date: '2 days ago',
-    icon: 'G',
-    iconBg: 'bg-black',
-    statusColor: 'text-green-600',
-    iconColor: 'text-yellow-400',
-  },
-  {
-    id: '2',
-    company: 'Microsoft',
-    role: 'PM Intern',
-    status: 'Interview',
-    salary: '$110k',
-    date: 'Oct 12',
-    icon: '🪟',
-    iconBg: 'bg-[#E5E7EB]',
-    statusColor: 'text-[#A16207]',
-  },
-  {
-    id: '3',
-    company: 'Stripe',
-    role: 'Backend Engineer',
-    status: 'Rejected',
-    salary: '$130k',
-    date: 'Oct 05',
-    icon: '💳',
-    iconBg: 'bg-gray-300',
-    statusColor: 'text-red-500',
-  },
-];
-
 type ApplicationsContextType = {
   applications: Application[];
   setApplications: React.Dispatch<React.SetStateAction<Application[]>>;
@@ -60,8 +23,25 @@ type ApplicationsContextType = {
 const ApplicationsContext = createContext<ApplicationsContextType | undefined>(undefined);
 
 export function ApplicationsProvider({ children }: { children: ReactNode }) {
-  const [applications, setApplications] = useState<Application[]>(initialApps);
+  const [applications, setApplications] = useState<Application[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
+
+  useEffect(() => {
+    const fetchApps = async () => {
+      const { data, error } = await supabase
+        .from('applications')
+        .select('*')
+        .order('id', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching applications:', error);
+      } else if (data) {
+        setApplications(data as Application[]);
+      }
+    };
+
+    fetchApps();
+  }, []);
 
   return (
     <ApplicationsContext.Provider

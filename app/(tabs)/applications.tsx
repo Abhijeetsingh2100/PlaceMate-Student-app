@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, Feather } from '@expo/vector-icons';
+import { supabase } from '../../lib/supabase';
 
 import { useApplications, Application } from '../../context/ApplicationsContext';
 
@@ -44,7 +45,13 @@ export default function Applications() {
     setActionMenuVisible(true);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
+    const { error } = await supabase.from('applications').delete().eq('id', id);
+    if (error) {
+      console.error('Error deleting application:', error);
+      Alert.alert('Error', 'Failed to delete application.');
+      return;
+    }
     setApplications((prev) => prev.filter((app) => app.id !== id));
   };
 
@@ -87,7 +94,7 @@ export default function Applications() {
     (app) => !['Rejected', 'Offer'].includes(app.status)
   ).length;
 
-  const handleSaveApplication = () => {
+  const handleSaveApplication = async () => {
     if (!company || !role) return;
 
     let statusColor = 'text-[#3525CD]';
@@ -96,23 +103,31 @@ export default function Applications() {
     if (status === 'Rejected') statusColor = 'text-red-500';
 
     if (editingAppId) {
+      const updatedApp = {
+        company,
+        role,
+        status,
+        salary: salary || 'N/A',
+        statusColor,
+        icon: company.charAt(0).toUpperCase(),
+      };
+
+      const { error } = await supabase
+        .from('applications')
+        .update(updatedApp)
+        .eq('id', editingAppId);
+
+      if (error) {
+        console.error('Error updating application:', error);
+        Alert.alert('Error', 'Failed to update application.');
+        return;
+      }
+
       setApplications((prev) =>
-        prev.map((app) =>
-          app.id === editingAppId
-            ? {
-                ...app,
-                company,
-                role,
-                status,
-                salary: salary || 'N/A',
-                statusColor,
-                icon: company.charAt(0).toUpperCase(),
-              }
-            : app
-        )
+        prev.map((app) => (app.id === editingAppId ? { ...app, ...updatedApp } : app))
       );
     } else {
-      const newApp: Application = {
+      const newApp = {
         id: Date.now().toString(),
         company,
         role,
@@ -123,7 +138,16 @@ export default function Applications() {
         iconBg: 'bg-gray-200',
         statusColor,
       };
-      setApplications([newApp, ...applications]);
+
+      const { data, error } = await supabase.from('applications').insert([newApp]).select();
+
+      if (error || !data || data.length === 0) {
+        console.error('Error inserting application:', error);
+        Alert.alert('Error', 'Failed to save application.');
+        return;
+      }
+
+      setApplications([data[0] as Application, ...applications]);
     }
 
     setCompany('');
@@ -141,7 +165,7 @@ export default function Applications() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 100 }}>
         {/* Header */}
-          <View
+        <View
           className="mx-4 mt-4 flex-row items-center justify-center rounded-3xl bg-white px-4 py-3"
           style={{
             elevation: 8,
@@ -151,7 +175,9 @@ export default function Applications() {
             className="h-14 w-14 rounded-full"
           />
 
-          <Text className="text-2xl justify-center px-4 items-center font-bold text-[#3525CD]">PlaceMate</Text>
+          <Text className="items-center justify-center px-4 text-2xl font-bold text-[#3525CD]">
+            PlaceMate
+          </Text>
 
           {/* <TouchableOpacity
             className="h-12 w-12 items-center justify-center rounded-2xl bg-white"
