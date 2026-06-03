@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, ScrollView, Alert, Modal, TextInput, ActivityIndicator } from 'react-native';
+import { View, Text, Image, TouchableOpacity, ScrollView, Alert, Modal, TextInput, ActivityIndicator, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, Feather, MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -187,6 +187,26 @@ export default function Profile() {
               <Text className="ml-4 text-base font-semibold text-[#1F2937]">Privacy & Security</Text>
             </View>
             <Feather name="chevron-right" size={20} color="#9CA3AF" />
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => Linking.openURL('mailto:abhijeet200508@gmail.com')} className="flex-row items-center justify-between border-b border-gray-100 px-4 py-4">
+            <View className="flex-row items-center">
+              <View className="h-10 w-10 items-center justify-center rounded-full bg-gray-100">
+                <Feather name="mail" size={20} color="#4B5563" />
+              </View>
+              <Text className="ml-4 text-base font-semibold text-[#1F2937]">Contact Developer</Text>
+            </View>
+            <Feather name="external-link" size={20} color="#9CA3AF" />
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => Linking.openURL('https://www.linkedin.com/in/abhijeet-singh-a6571b325/')} className="flex-row items-center justify-between border-b border-gray-100 px-4 py-4">
+            <View className="flex-row items-center">
+              <View className="h-10 w-10 items-center justify-center rounded-full bg-gray-100">
+                <Feather name="linkedin" size={20} color="#4B5563" />
+              </View>
+              <Text className="ml-4 text-base font-semibold text-[#1F2937]">LinkedIn Profile</Text>
+            </View>
+            <Feather name="external-link" size={20} color="#9CA3AF" />
           </TouchableOpacity>
 
           <TouchableOpacity 
