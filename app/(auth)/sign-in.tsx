@@ -163,24 +163,7 @@ const SignIn = () => {
           </TouchableOpacity>
 
           {/* Divider */}
-          <View className="my-8 flex-row items-center">
-            <View className="h-[1px] flex-1 bg-gray-300" />
-
-            <Text className="mx-4 text-gray-400">OR CONTINUE WITH</Text>
-
-            <View className="h-[1px] flex-1 bg-gray-300" />
-          </View>
-
-          {/* Social Buttons */}
-          <View className="flex-row justify-between">
-            <TouchableOpacity className="mr-2 h-14 flex-1 items-center justify-center rounded-xl border border-gray-200">
-              <Text>Google</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity className="ml-2 h-14 flex-1 items-center justify-center rounded-xl border border-gray-200">
-              <Text>SSO</Text>
-            </TouchableOpacity>
-          </View>
+          
 
           {/* Footer */}
         </View>

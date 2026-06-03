@@ -66,9 +66,19 @@ const SignUp = () => {
       await signUp.create({
         emailAddress: email,
         password,
-        firstName,
-        lastName,
       });
+      
+      try {
+        if (firstName || lastName) {
+          await signUp.update({
+            firstName,
+            lastName,
+          });
+        }
+      } catch (e) {
+        console.warn('Name fields might not be enabled in Clerk Dashboard', e);
+      }
+
       await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
       setPendingVerification(true);
     } catch (err: any) {
@@ -240,16 +250,16 @@ const SignUp = () => {
                 </TouchableOpacity>
 
                 {/* Divider */}
-                <View className="my-8 flex-row items-center">
+                {/* <View className="my-8 flex-row items-center">
                   <View className="h-[1px] flex-1 bg-gray-300" />
 
                   <Text className="mx-4 text-gray-400">OR CONTINUE WITH</Text>
 
                   <View className="h-[1px] flex-1 bg-gray-300" />
-                </View>
+                </View> */}
 
                 {/* Social Buttons */}
-                <View className="flex-row justify-between">
+                {/* <View className="flex-row justify-between">
                   <TouchableOpacity className="mr-2 h-14 flex-1 items-center justify-center rounded-xl border border-gray-200">
                     <Text>Google</Text>
                   </TouchableOpacity>
@@ -257,7 +267,7 @@ const SignUp = () => {
                   <TouchableOpacity className="ml-2 h-14 flex-1 items-center justify-center rounded-xl border border-gray-200">
                     <Text>SSO</Text>
                   </TouchableOpacity>
-                </View>
+                </View> */}
               </View>
             </View>
 

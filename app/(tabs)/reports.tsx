@@ -23,7 +23,6 @@ export default function Reports() {
     const { data, error } = await supabase
       .from('reports')
       .select('*')
-      .eq('user_id', userId)
       .order('id', { ascending: false });
     if (data && !error) {
       setHistory(data);
@@ -44,7 +43,6 @@ export default function Reports() {
 
     const newReport = {
       id: Date.now().toString(),
-      user_id: userId,
       dsa_count: dsaCount.toString(),
       hours: hours.toString(),
       topics,
