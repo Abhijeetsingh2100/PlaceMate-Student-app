@@ -37,11 +37,11 @@ function InitialLayout() {
   useEffect(() => {
     if (!isLoaded) return;
 
-    const inTabsGroup = segments[0] === '(tabs)';
+    const isPublicRoute = segments[0] === '(auth)' || segments[0] === 'onboarding' || !segments[0];
     
-    if (isSignedIn && !inTabsGroup) {
+    if (isSignedIn && isPublicRoute) {
       router.replace('/(tabs)/dashboard');
-    } else if (!isSignedIn && inTabsGroup) {
+    } else if (!isSignedIn && !isPublicRoute) {
       router.replace('/onboarding');
     }
 

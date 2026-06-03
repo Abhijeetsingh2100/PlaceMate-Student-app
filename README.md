@@ -9,10 +9,8 @@ PlaceMate is a modern cross-platform mobile application built for students and j
 ## 🚀 Features
 
 ### 📊 Smart Dashboard
-
 * Personalized welcome greeting
 * Live placement statistics
-
   * Total Applications
   * Active Applications
   * Offers Received
@@ -22,10 +20,8 @@ PlaceMate is a modern cross-platform mobile application built for students and j
 * Quick action shortcuts
 
 ### 💼 Application Tracker
-
 * Add, update, and delete applications
 * Track complete application lifecycle
-
   * Applied
   * Online Assessment (OA)
   * Interview
@@ -37,10 +33,8 @@ PlaceMate is a modern cross-platform mobile application built for students and j
 * Automatic company logo fetching via Icon Horse API
 
 ### 📚 Study & Preparation Reports
-
 * Log daily preparation activities
 * Track:
-
   * DSA questions solved
   * Study hours
   * Topics covered
@@ -49,14 +43,12 @@ PlaceMate is a modern cross-platform mobile application built for students and j
 * Rest-day tracking
 
 ### 👤 User Profile Management
-
 * Secure authentication with Clerk
 * Profile image upload
 * Editable user details
 * Personalized experience
 
 ### 🔒 Security & Data Privacy
-
 * User-specific data isolation
 * JWT-based authentication
 * Row-Level Security (RLS)
@@ -83,40 +75,9 @@ PlaceMate is a modern cross-platform mobile application built for students and j
 
 ---
 
-## 📱 Screens
-
-### Home Dashboard
-
-* Statistics overview
-* Monthly trends chart
-* Recent applications
-* Quick action cards
-
-### Applications
-
-* Application listing
-* Search & filter
-* Status tracking
-* Add/Edit/Delete functionality
-
-### Reports
-
-* Daily preparation logs
-* Study analytics
-* Historical timeline
-
-### Profile
-
-* User information
-* Profile image management
-* Account settings
-
----
-
 ## 🗄️ Database Schema
 
 ### Applications Table
-
 | Field       | Type   |
 | ----------- | ------ |
 | id          | String |
@@ -132,7 +93,6 @@ PlaceMate is a modern cross-platform mobile application built for students and j
 | statusColor | String |
 
 ### Reports Table
-
 | Field     | Type   |
 | --------- | ------ |
 | id        | String |
@@ -148,7 +108,6 @@ PlaceMate is a modern cross-platform mobile application built for students and j
 ## ⚙️ Installation
 
 ### Prerequisites
-
 * Node.js (v18+)
 * npm or yarn
 * Expo CLI
@@ -156,33 +115,25 @@ PlaceMate is a modern cross-platform mobile application built for students and j
 * Clerk Account
 
 ### Clone Repository
-
 ```bash
 git clone https://github.com/yourusername/placemate.git
-
 cd placemate
 ```
 
 ### Install Dependencies
-
 ```bash
 npm install
 ```
 
 ### Configure Environment Variables
-
 Create a `.env` file:
-
 ```env
 EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_key
-
 EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
-
 EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
 ### Run Application
-
 ```bash
 npx expo start
 ```
@@ -190,7 +141,6 @@ npx expo start
 ---
 
 ## 🔐 Authentication Flow
-
 1. User registers or logs in using Clerk.
 2. Clerk generates a secure session token.
 3. JWT token is passed to Supabase.
@@ -200,7 +150,6 @@ npx expo start
 ---
 
 ## 📈 Future Enhancements
-
 * Push notifications for interviews and assessments
 * Resume parsing and analysis
 * Job description auto-fill via URL
@@ -214,7 +163,6 @@ npx expo start
 ---
 
 ## 🎯 Target Users
-
 * College students preparing for placements
 * Internship seekers
 * Fresh graduates
@@ -223,16 +171,12 @@ npx expo start
 ---
 
 ## 🤝 Contributing
-
 Contributions, issues, and feature requests are welcome.
-
 ```bash
 # Create feature branch
 git checkout -b feature/new-feature
-
 # Commit changes
 git commit -m "Add new feature"
-
 # Push changes
 git push origin feature/new-feature
 ```
@@ -240,13 +184,10 @@ git push origin feature/new-feature
 ---
 
 ## 📄 License
-
 This project is licensed under the MIT License.
 
 ---
 
 ## 👨‍💻 Author
-
 **Abhijeet Singh**
-
 Building tools that help students stay consistent, organized, and successful throughout their placement journey. 🚀

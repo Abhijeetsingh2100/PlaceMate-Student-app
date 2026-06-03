@@ -179,7 +179,7 @@ export default function Profile() {
             <Feather name="chevron-right" size={20} color="#9CA3AF" />
           </TouchableOpacity>
 
-          <TouchableOpacity className="flex-row items-center justify-between border-b border-gray-100 px-4 py-4">
+          <TouchableOpacity onPress={() => router.push('/privacy')} className="flex-row items-center justify-between border-b border-gray-100 px-4 py-4">
             <View className="flex-row items-center">
               <View className="h-10 w-10 items-center justify-center rounded-full bg-gray-100">
                 <Feather name="lock" size={20} color="#4B5563" />
