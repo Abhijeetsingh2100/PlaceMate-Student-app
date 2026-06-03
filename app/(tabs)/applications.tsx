@@ -10,6 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -21,7 +22,7 @@ import { useApplications, Application } from '../../context/ApplicationsContext'
 const FILTERS = ['All', 'Applied', 'OA', 'Interview', 'Rejected'];
 
 export default function Applications() {
-  const { applications, setApplications, modalVisible, setModalVisible } = useApplications();
+  const { applications, setApplications, modalVisible, setModalVisible, isLoading } = useApplications();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
@@ -97,6 +98,42 @@ export default function Applications() {
   const activeRoundsCount = applications.filter(
     (app) => !['Rejected', 'Offer'].includes(app.status)
   ).length;
+
+  if (isLoading) {
+    return (
+      <SafeAreaView className="flex-1 bg-gray-50">
+        <View className="mb-4 flex-row items-center justify-between px-6 pt-4">
+          <View className="h-10 w-48 rounded-lg bg-gray-200" />
+          <View className="h-10 w-10 rounded-full bg-gray-200" />
+        </View>
+
+        <View className="mx-4 mt-2 h-12 rounded-2xl bg-gray-200" />
+        
+        <View className="mt-5 flex-row px-4">
+          {[1, 2, 3].map((i) => (
+            <View key={i} className="mr-3 h-9 w-24 rounded-full bg-gray-200" />
+          ))}
+        </View>
+
+        <View className="mt-8 px-4">
+          {[1, 2, 3, 4].map((i) => (
+            <View key={i} className="mb-4 flex-row rounded-3xl bg-white p-4" style={{ elevation: 4 }}>
+              <View className="h-12 w-12 rounded-xl bg-gray-200" />
+              <View className="ml-4 flex-1">
+                <View className="mb-2 h-4 w-20 rounded bg-gray-200" />
+                <View className="mb-1 h-6 w-32 rounded bg-gray-200" />
+                <View className="h-4 w-24 rounded bg-gray-200" />
+              </View>
+              <View className="items-end">
+                <View className="mb-2 h-6 w-24 rounded bg-gray-200" />
+                <View className="h-4 w-16 rounded bg-gray-200" />
+              </View>
+            </View>
+          ))}
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   const handleSaveApplication = async () => {
     if (!company || !role) return;
@@ -177,7 +214,7 @@ export default function Applications() {
             elevation: 8,
           }}>
           <Image
-            source={require('../../assets/images/avatar1.png')}
+            source={require('../../assets/images/screenlogo.png')}
             className="h-14 w-14 rounded-full"
           />
 
@@ -233,37 +270,55 @@ export default function Applications() {
         </View>
 
         {/* Applications List */}
-        {filteredApps.map((app) => (
-          <TouchableOpacity
-            key={app.id}
-            onLongPress={() => handleLongPress(app)}
-            delayLongPress={300}
-            className="mx-4 mt-4 flex-row rounded-3xl bg-white p-4"
-            style={{ elevation: 4 }}>
-            {imageErrors[app.id] ? (
-              <View className={`h-12 w-12 items-center justify-center rounded-xl ${app.iconBg}`}>
-                <Text className={`font-bold ${app.iconColor || 'text-black'}`}>{app.icon}</Text>
+        {filteredApps.map((app) => {
+          // Calculate dynamic time from the timestamp ID
+          let displayTime = app.date;
+          const timestamp = parseInt(app.id, 10);
+          // Valid timestamp IDs are long (e.g., 171...)
+          if (!isNaN(timestamp) && app.id.length > 10) {
+            const diffMs = Date.now() - timestamp;
+            const diffMins = Math.floor(diffMs / (1000 * 60));
+            const diffHrs = Math.floor(diffMins / 60);
+            const diffDays = Math.floor(diffHrs / 24);
+            
+            if (diffDays > 0) displayTime = `${diffDays}d ago`;
+            else if (diffHrs > 0) displayTime = `${diffHrs}h ago`;
+            else if (diffMins > 0) displayTime = `${diffMins}m ago`;
+            else displayTime = 'Just now';
+          }
+
+          return (
+            <TouchableOpacity
+              key={app.id}
+              onLongPress={() => handleLongPress(app)}
+              delayLongPress={300}
+              className="mx-4 mt-4 flex-row rounded-3xl bg-white p-4"
+              style={{ elevation: 4 }}>
+              {imageErrors[app.id] ? (
+                <View className={`h-12 w-12 items-center justify-center rounded-xl ${app.iconBg}`}>
+                  <Text className={`font-bold ${app.iconColor || 'text-black'}`}>{app.icon}</Text>
+                </View>
+              ) : (
+                <Image
+                  source={{ uri: `https://icon.horse/icon/${getCompanyDomain(app.company)}` }}
+                  className="rounded-xl bg-white"
+                  style={{ width: 48, height: 48 }}
+                  resizeMode="contain"
+                  onError={() => setImageErrors((prev) => ({ ...prev, [app.id]: true }))}
+                />
+              )}
+              <View className="ml-4 flex-1">
+                <Text className={`text-xl font-bold uppercase ${app.statusColor}`}>{app.status}</Text>
+                <Text className="mt-1 text-2xl">{app.company}</Text>
+                <Text className="text-gray-500">{app.role}</Text>
               </View>
-            ) : (
-              <Image
-                source={{ uri: `https://icon.horse/icon/${getCompanyDomain(app.company)}` }}
-                className="rounded-xl bg-white"
-                style={{ width: 48, height: 48 }}
-                resizeMode="contain"
-                onError={() => setImageErrors((prev) => ({ ...prev, [app.id]: true }))}
-              />
-            )}
-            <View className="ml-4 flex-1">
-              <Text className={`text-xl font-bold uppercase ${app.statusColor}`}>{app.status}</Text>
-              <Text className="mt-1 text-2xl">{app.company}</Text>
-              <Text className="text-gray-500">{app.role}</Text>
-            </View>
-            <View className="items-end">
-              <Text className="text-xl font-bold text-[#3525CD]">{app.salary}</Text>
-              <Text className="mt-2 text-gray-500">{app.date}</Text>
-            </View>
-          </TouchableOpacity>
-        ))}
+              <View className="items-end">
+                <Text className="text-xl font-bold text-[#3525CD]">{app.salary}</Text>
+                <Text className="mt-2 text-gray-500">{displayTime}</Text>
+              </View>
+            </TouchableOpacity>
+          );
+        })}
         {filteredApps.length === 0 && (
           <View className="mx-4 mt-10 items-center justify-center">
             <Text className="text-gray-500">No applications found.</Text>

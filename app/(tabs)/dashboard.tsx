@@ -1,4 +1,4 @@
-import { View, Text, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -6,7 +6,7 @@ import { useApplications } from '../../context/ApplicationsContext';
 
 export default function Dashboard() {
   const router = useRouter();
-  const { applications, setModalVisible } = useApplications();
+  const { applications, setModalVisible, isLoading } = useApplications();
 
   const totalApps = applications.length;
   const activeApps = applications.filter(
@@ -14,6 +14,37 @@ export default function Dashboard() {
   ).length;
   const rejectedApps = applications.filter((app) => app.status === 'Rejected').length;
   const offerApps = applications.filter((app) => app.status === 'Offer').length;
+
+  if (isLoading) {
+    return (
+      <SafeAreaView className="flex-1 bg-gray-50">
+        {/* Header Skeleton */}
+        <View
+          className="mx-4 mb-4 mt-4 flex-row items-center justify-center rounded-3xl bg-white px-4 py-3"
+          style={{ elevation: 8 }}>
+          <View className="h-14 w-14 rounded-full bg-gray-200" />
+          <View className="ml-4 h-8 w-32 rounded-lg bg-gray-200" />
+        </View>
+
+        {/* Greeting Skeleton */}
+        <View className="mt-4 px-5">
+          <View className="mb-2 h-8 w-48 rounded-lg bg-gray-200" />
+          <View className="h-4 w-64 rounded-lg bg-gray-200" />
+        </View>
+
+        {/* Stats Grid Skeleton */}
+        <View className="mt-8 flex-row flex-wrap justify-between px-4">
+          {[1, 2, 3, 4].map((i) => (
+            <View key={i} className="mb-4 w-[48%] rounded-3xl bg-white p-5" style={{ elevation: 4 }}>
+              <View className="mb-4 h-10 w-10 rounded-full bg-gray-200" />
+              <View className="mb-2 h-8 w-16 rounded-lg bg-gray-200" />
+              <View className="h-4 w-24 rounded-lg bg-gray-200" />
+            </View>
+          ))}
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   // Dynamic Recent Activity (Top 3)
   const recentApps = applications.slice(0, 3);
@@ -117,7 +148,7 @@ export default function Dashboard() {
             elevation: 8,
           }}>
           <Image
-            source={require('../../assets/images/avatar1.png')}
+            source={require('../../assets/images/screenlogo.png')}
             className="h-14 w-14 rounded-full"
           />
 

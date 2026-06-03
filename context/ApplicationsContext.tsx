@@ -18,6 +18,7 @@ type ApplicationsContextType = {
   setApplications: React.Dispatch<React.SetStateAction<Application[]>>;
   modalVisible: boolean;
   setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  isLoading: boolean;
 };
 
 const ApplicationsContext = createContext<ApplicationsContextType | undefined>(undefined);
@@ -25,18 +26,26 @@ const ApplicationsContext = createContext<ApplicationsContextType | undefined>(u
 export function ApplicationsProvider({ children }: { children: ReactNode }) {
   const [applications, setApplications] = useState<Application[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchApps = async () => {
-      const { data, error } = await supabase
-        .from('applications')
-        .select('*')
-        .order('id', { ascending: false });
+      setIsLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('applications')
+          .select('*')
+          .order('id', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching applications:', error);
-      } else if (data) {
-        setApplications(data as Application[]);
+        if (error) {
+          console.error('Error fetching applications:', error);
+        } else if (data) {
+          setApplications(data as Application[]);
+        }
+      } catch (err) {
+        console.error('Unexpected error during fetch:', err);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -50,6 +59,7 @@ export function ApplicationsProvider({ children }: { children: ReactNode }) {
         setApplications,
         modalVisible,
         setModalVisible,
+        isLoading,
       }}>
       {children}
     </ApplicationsContext.Provider>

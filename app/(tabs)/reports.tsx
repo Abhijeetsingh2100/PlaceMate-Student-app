@@ -77,7 +77,7 @@ export default function Reports() {
           className="mx-4 mt-4 flex-row items-center justify-center rounded-3xl bg-white px-4 py-3"
           style={{ elevation: 8 }}>
           <Image
-            source={require('../../assets/images/avatar1.png')}
+            source={require('../../assets/images/screenlogo.png')}
             className="h-14 w-14 rounded-full"
           />
           <Text className="items-center justify-center px-4 text-2xl font-bold text-[#3525CD]">
