@@ -4,8 +4,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, Feather } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
 import { supabase } from '../../lib/supabase';
+import { useAuth } from '@clerk/clerk-expo';
 
 export default function Reports() {
+  const { userId } = useAuth();
   const [dsaCount, setDsaCount] = useState(8);
   const [hours, setHours] = useState(4.5);
   const [topics, setTopics] = useState('');
@@ -17,9 +19,11 @@ export default function Reports() {
   }, []);
 
   const fetchReports = async () => {
+    if (!userId) return;
     const { data, error } = await supabase
       .from('reports')
       .select('*')
+      .eq('user_id', userId)
       .order('id', { ascending: false });
     if (data && !error) {
       setHistory(data);
@@ -40,6 +44,7 @@ export default function Reports() {
 
     const newReport = {
       id: Date.now().toString(),
+      user_id: userId,
       dsa_count: dsaCount.toString(),
       hours: hours.toString(),
       topics,

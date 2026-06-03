@@ -5,6 +5,9 @@ import { ClerkProvider, ClerkLoaded, useAuth } from '@clerk/clerk-expo';
 import { ApplicationsProvider } from '../context/ApplicationsContext';
 import * as SecureStore from 'expo-secure-store';
 import { useEffect } from 'react';
+import * as SplashScreen from 'expo-splash-screen';
+
+SplashScreen.preventAutoHideAsync();
 
 const tokenCache = {
   async getToken(key: string) {
@@ -41,6 +44,9 @@ function InitialLayout() {
     } else if (!isSignedIn && inTabsGroup) {
       router.replace('/onboarding');
     }
+
+    // Hide splash screen once routing is determined
+    SplashScreen.hideAsync();
   }, [isSignedIn, isLoaded, segments]);
 
   return <Stack screenOptions={{ headerShown: false }} />;

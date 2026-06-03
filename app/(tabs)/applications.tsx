@@ -16,12 +16,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons, Feather } from '@expo/vector-icons';
 import { supabase } from '../../lib/supabase';
+import { useAuth } from '@clerk/clerk-expo';
 
 import { useApplications, Application } from '../../context/ApplicationsContext';
 
 const FILTERS = ['All', 'Applied', 'OA', 'Interview', 'Rejected'];
 
 export default function Applications() {
+  const { userId } = useAuth();
   const { applications, setApplications, modalVisible, setModalVisible, isLoading } = useApplications();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('All');
@@ -171,6 +173,7 @@ export default function Applications() {
     } else {
       const newApp = {
         id: Date.now().toString(),
+        user_id: userId,
         company,
         role,
         status,

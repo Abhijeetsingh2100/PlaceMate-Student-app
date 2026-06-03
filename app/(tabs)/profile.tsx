@@ -75,7 +75,7 @@ export default function Profile() {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [1, 1],
-      quality: 0.5,
+      quality: 0.1, // Drastically reduce size for instant upload!
       base64: true,
     });
 
@@ -115,7 +115,12 @@ export default function Profile() {
               source={user?.imageUrl ? { uri: user.imageUrl } : require('../../assets/images/avatar1.png')}
               className="h-28 w-28 rounded-full border-4 border-gray-50"
             />
-            <TouchableOpacity onPress={pickImage} className="absolute bottom-0 right-0 h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[#3525CD]">
+            {loadingEdit && (
+              <View className="absolute h-28 w-28 items-center justify-center rounded-full bg-black/30">
+                <ActivityIndicator color="white" size="large" />
+              </View>
+            )}
+            <TouchableOpacity onPress={pickImage} disabled={loadingEdit} className="absolute bottom-0 right-0 h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[#3525CD]">
               <Feather name="camera" size={14} color="white" />
             </TouchableOpacity>
           </View>
