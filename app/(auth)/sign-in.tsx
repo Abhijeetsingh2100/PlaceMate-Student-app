@@ -1,11 +1,43 @@
-import React from 'react';
-import { View, Text, Image, TextInput, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Image, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import 'global.css';
 import { useRouter } from 'expo-router';
+import { useSignIn } from '@clerk/clerk-expo';
+import 'global.css';
 
 const SignIn = () => {
   const router = useRouter();
+  const { signIn, setActive, isLoaded } = useSignIn();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const onSignInPress = async () => {
+    if (!isLoaded) return;
+    if (!email || !password) {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
+    setLoading(true);
+    try {
+      const signInAttempt = await signIn.create({
+        identifier: email,
+        password,
+      });
+
+      if (signInAttempt.status === 'complete') {
+        await setActive({ session: signInAttempt.createdSessionId });
+      } else {
+        console.error(JSON.stringify(signInAttempt, null, 2));
+        Alert.alert('Sign In Failed', 'Please try again.');
+      }
+    } catch (err: any) {
+      Alert.alert('Sign In Error', err.errors?.[0]?.message || err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-white px-6">
       {/* Logo Section */}
@@ -27,6 +59,10 @@ const SignIn = () => {
 
           <TextInput
             placeholder="student@university.edu"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            value={email}
+            onChangeText={setEmail}
             className="mb-5 rounded-xl border border-gray-300 px-4 py-4"
           />
 
@@ -41,16 +77,22 @@ const SignIn = () => {
           <TextInput
             placeholder="********"
             secureTextEntry
+            value={password}
+            onChangeText={setPassword}
             className="rounded-xl border border-gray-300 px-4 py-4"
           />
 
           {/* Login Button */}
           <TouchableOpacity
-            className="mt-8 h-14 items-center justify-center rounded-xl bg-[#3525CD]"
-            style={{
-              elevation: 6,
-            }}>
-            <Text className="text-lg font-bold text-white">Login</Text>
+            onPress={onSignInPress}
+            disabled={loading}
+            className="mt-8 h-14 flex-row items-center justify-center rounded-xl bg-[#3525CD]"
+            style={{ elevation: 6 }}>
+            {loading ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              <Text className="text-lg font-bold text-white">Log In</Text>
+            )}
           </TouchableOpacity>
 
           {/* Divider */}

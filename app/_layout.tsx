@@ -1,17 +1,60 @@
-import { Stack } from 'expo-router';
+import { Stack, useSegments, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import '../global.css';
+import { ClerkProvider, ClerkLoaded, useAuth } from '@clerk/clerk-expo';
+import { ApplicationsProvider } from '../context/ApplicationsContext';
+import * as SecureStore from 'expo-secure-store';
+import { useEffect } from 'react';
+
+const tokenCache = {
+  async getToken(key: string) {
+    try {
+      const item = await SecureStore.getItemAsync(key);
+      return item;
+    } catch (error) {
+      return null;
+    }
+  },
+  async saveToken(key: string, value: string) {
+    try {
+      return SecureStore.setItemAsync(key, value);
+    } catch (err) {
+      return;
+    }
+  },
+};
+
+const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
+
+function InitialLayout() {
+  const { isLoaded, isSignedIn } = useAuth();
+  const segments = useSegments();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    const inTabsGroup = segments[0] === '(tabs)';
+    
+    if (isSignedIn && !inTabsGroup) {
+      router.replace('/(tabs)/dashboard');
+    } else if (!isSignedIn && inTabsGroup) {
+      router.replace('/onboarding');
+    }
+  }, [isSignedIn, isLoaded, segments]);
+
+  return <Stack screenOptions={{ headerShown: false }} />;
+}
 
 export default function RootLayout() {
   return (
-    <>
-      <StatusBar style="auto" />
-
-      <Stack
-        screenOptions={{
-          headerShown: false,
-        }}
-      />
-    </>
+    <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
+      <ClerkLoaded>
+        <ApplicationsProvider>
+          <StatusBar style="auto" />
+          <InitialLayout />
+        </ApplicationsProvider>
+      </ClerkLoaded>
+    </ClerkProvider>
   );
 }

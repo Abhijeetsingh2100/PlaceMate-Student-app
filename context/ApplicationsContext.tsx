@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase, setSupabaseTokenProvider } from '../lib/supabase';
+import { useAuth } from '@clerk/clerk-expo';
 export type Application = {
   id: string;
   company: string;
@@ -24,17 +25,30 @@ type ApplicationsContextType = {
 const ApplicationsContext = createContext<ApplicationsContextType | undefined>(undefined);
 
 export function ApplicationsProvider({ children }: { children: ReactNode }) {
+  const { isLoaded, isSignedIn, userId, getToken } = useAuth();
   const [applications, setApplications] = useState<Application[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Provide Clerk's JWT token to Supabase client globally
+  useEffect(() => {
+    setSupabaseTokenProvider(() => getToken({ template: 'supabase' }));
+  }, [getToken]);
+
   useEffect(() => {
     const fetchApps = async () => {
+      if (!isLoaded || !isSignedIn || !userId) {
+        setApplications([]);
+        setIsLoading(false);
+        return;
+      }
+
       setIsLoading(true);
       try {
         const { data, error } = await supabase
           .from('applications')
           .select('*')
+          .eq('user_id', userId)
           .order('id', { ascending: false });
 
         if (error) {
@@ -50,7 +64,7 @@ export function ApplicationsProvider({ children }: { children: ReactNode }) {
     };
 
     fetchApps();
-  }, []);
+  }, [isLoaded, isSignedIn, userId]);
 
   return (
     <ApplicationsContext.Provider

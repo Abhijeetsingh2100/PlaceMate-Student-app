@@ -3,10 +3,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useApplications } from '../../context/ApplicationsContext';
+import { useUser } from '@clerk/clerk-expo';
 
 export default function Dashboard() {
   const router = useRouter();
   const { applications, setModalVisible, isLoading } = useApplications();
+  const { user } = useUser();
 
   const totalApps = applications.length;
   const activeApps = applications.filter(
@@ -167,7 +169,7 @@ export default function Dashboard() {
 
         {/* Greeting */}
         <View className="mt-8 px-5">
-          <Text className="text-3xl font-bold text-[#1E1E1E]">Hi, Abhijeet 👋</Text>
+          <Text className="text-3xl font-bold text-[#1E1E1E]">Hi, {user?.firstName || 'Student'} 👋</Text>
 
           <Text className="mt-2 text-base text-[#6B7280]">
             Your placement journey is looking strong today.
