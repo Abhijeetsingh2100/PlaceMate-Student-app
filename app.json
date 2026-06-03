@@ -31,7 +31,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/app-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.abhijeetsingh200.placemate"
     },
     "extra": {
       "router": {},
