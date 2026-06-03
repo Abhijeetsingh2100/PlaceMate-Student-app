@@ -94,6 +94,8 @@ export default function Profile() {
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
+
+      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
       {/* Header */}
       <View
         className="mx-4 mb-4 mt-4 flex-row items-center justify-center rounded-3xl bg-white px-4 py-3"
@@ -106,8 +108,6 @@ export default function Profile() {
           PlaceMate
         </Text>
       </View>
-
-      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         {/* Identity Card */}
         <View className="mx-4 mt-2 items-center rounded-3xl bg-white p-6" style={{ elevation: 4 }}>
           <View className="relative">
