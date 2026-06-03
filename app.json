@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "my-expo-app",
-    "slug": "my-expo-app",
+    "slug": "placemate",
     "version": "1.0.0",
     "web": {
       "favicon": "./assets/favicon.png"
@@ -32,6 +32,13 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       }
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "9eb80b8d-1aa3-4916-98af-4d4d5ce69100"
+      }
+    },
+    "owner": "abhijeetsingh200"
   }
 }
