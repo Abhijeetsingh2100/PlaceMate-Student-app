@@ -250,7 +250,7 @@ export default function Dashboard() {
           <View className="flex-row items-center justify-between">
             <Text className="text-2xl font-bold text-[#1F2937]">Monthly Trend</Text>
 
-            <Text className="font-medium text-gray-500">Apps per Month</Text>
+            <Text className="font-medium text-gray-500">Apps. per Month</Text>
           </View>
 
           {/* Chart */}
@@ -312,7 +312,7 @@ export default function Dashboard() {
             );
           })}
           {recentApps.length === 0 && (
-            <Text className="mt-4 text-center text-gray-500">No recent activity.</Text>
+            <Text className="mt-4 text-center text-gray-500">No recent activity at the moment .</Text>
           )}
         </View>
       </ScrollView>
